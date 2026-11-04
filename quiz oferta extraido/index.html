@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="pt-BR"><head><!-- Clonado por Ads Searcher — origem: https://ocorrecorrendotudo.netlify.app/ — 2026-11-04T19:02:00.539Z --><meta charSet="utf-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=713df20c-e400-43ce-8afa-bdaeebf1e779
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. --><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preload" as="image" href="campaign/campinos-logo.webp"><link rel="preload" as="image" href="campaign/desafio-outubro-rosa.webp" fetchPriority="high"><link rel="preload" as="image" href="campaign/um-corre-por-todas.webp"><link rel="preload" as="image" href="campaign/laco-outubro-rosa.webp"><link rel="stylesheet" href="assets/styles-wnzisgRz.css" data-precedence="default"><title>Um corre por todas | Outubro Rosa</title><meta name="description" content="Um desafio sobre conscientização, cuidado e a campanha Outubro Rosa."><meta name="author" content="Olympikus"><meta property="og:title" content="Um corre por todas | Outubro Rosa"><meta property="og:description" content="Um desafio sobre conscientização, cuidado e a campanha Outubro Rosa."><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/index-PLGzEtP5.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/useRouter-Dpb7RwMI.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/createServerFn-BvYVUQWk.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/link-BH4TZkOC.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/rastreamento-DaPTTQBg.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/tracking-BmYU30qX.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/campaign-DrCUSxaj.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/preload-helper-BmLnFoW3.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/routes-B5DyioSp.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/createLucideIcon-DyOSRp63.js"><link rel="modulepreload" href="https://ocorrecorrendotudo.netlify.app/assets/campaign-frame-C4KkkZVY.js"><link rel="preload" as="font" href="fonts/inter-latin-variable.woff2" type="font/woff2" crossorigin="anonymous"><link rel="preload" as="image" href="campaign/pergunta1-outubro-rosa.webp"><link rel="icon" href="assets/campaign-icon.svg" type="image/svg+xml"><script id="campaign-attribution-persistent">(function browserTracking(keys, storageKey, cookieKey, legacyKey, lifetime, search, restoreUrl) {
+	if (typeof window === "undefined") return {
+		received: {},
+		saved: {}
+	};
+	const now = Date.now();
+	const validKey = (key) => keys.includes(key) || /^utm_[a-zA-Z0-9_]{1,64}$/.test(key);
+	const clean = (input) => {
+		if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+		return Object.fromEntries(Object.entries(input).filter(([key, value]) => validKey(key) && typeof value === "string" && value.length > 0 && value.length <= 1e3));
+	};
+	const parse = (raw) => {
+		try {
+			const data = JSON.parse(raw ?? "null");
+			if (!data || typeof data.expiresAt !== "number" || data.expiresAt <= now) return null;
+			const values = clean(data.values);
+			return Object.keys(values).length ? {
+				values,
+				expiresAt: data.expiresAt,
+				updatedAt: typeof data.updatedAt === "number" ? data.updatedAt : data.expiresAt - lifetime
+			} : null;
+		} catch {
+			return null;
+		}
+	};
+	let cookies = {};
+	try {
+		cookies = Object.fromEntries(document.cookie.split(";").map((part) => {
+			const index = part.indexOf("=");
+			return [part.slice(0, index).trim(), part.slice(index + 1)];
+		}));
+	} catch {}
+	let snapshot = null;
+	try {
+		snapshot = parse(window.localStorage.getItem(storageKey));
+	} catch {}
+	{
+		const count = Number(cookies[cookieKey]);
+		if (Number.isInteger(count) && count > 0 && count <= 64) try {
+			const parts = Array.from({ length: count }, (_, index) => cookies[cookieKey + "_" + index]);
+			if (parts.every((part) => typeof part === "string")) {
+				const backup = parse(decodeURIComponent(parts.join("")));
+				if (backup && (!snapshot || backup.updatedAt > snapshot.updatedAt)) snapshot = backup;
+			}
+		} catch {}
+	}
+	if (!snapshot && search !== null) try {
+		const values = clean(JSON.parse(window.sessionStorage.getItem(legacyKey) ?? "null"));
+		if (Object.keys(values).length) snapshot = {
+			values,
+			expiresAt: now + lifetime,
+			updatedAt: now
+		};
+	} catch {}
+	if (search === null) return {
+		received: {},
+		saved: snapshot?.values ?? {}
+	};
+	const query = new URLSearchParams(search);
+	const received = {};
+	for (const [key, value] of query) if (validKey(key) && value && value.length <= 1e3 && query.getAll(key).length === 1) received[key] = value;
+	const saved = snapshot?.values ?? {};
+	const changed = Object.entries(received).some(([key, value]) => saved[key] !== value);
+	const values = changed ? received : {
+		...saved,
+		...received
+	};
+	if (Object.keys(values).length) {
+		const next = {
+			values,
+			expiresAt: changed || !snapshot ? now + lifetime : snapshot.expiresAt,
+			updatedAt: !snapshot || JSON.stringify(values) !== JSON.stringify(saved) ? Math.max(now, (snapshot?.updatedAt ?? 0) + 1) : snapshot.updatedAt
+		};
+		const encoded = JSON.stringify(next);
+		try {
+			if (window.localStorage.getItem(storageKey) !== encoded) window.localStorage.setItem(storageKey, encoded);
+		} catch {}
+		try {
+			const parts = encodeURIComponent(encoded).match(/.{1,3000}/g) ?? [];
+			const previousCount = Number(cookies[cookieKey]) || 0;
+			const attributes = "; Path=/; SameSite=Lax; Expires=" + new Date(next.expiresAt).toUTCString() + (window.location.protocol === "https:" ? "; Secure" : "");
+			if (parts.length <= 64) {
+				parts.forEach((part, index) => {
+					const name = cookieKey + "_" + index;
+					if (cookies[name] !== part || changed) document.cookie = name + "=" + part + attributes;
+				});
+				document.cookie = cookieKey + "=" + parts.length + attributes;
+				for (let index = parts.length; index < Math.min(previousCount, 64); index++) document.cookie = cookieKey + "_" + index + "=; Path=/; Max-Age=0";
+			}
+		} catch {}
+		try {
+			window.sessionStorage.removeItem(legacyKey);
+		} catch {}
+	}
+	if (restoreUrl) try {
+		const url = new URL(window.location.href);
+		let restored = false;
+		for (const [key, value] of Object.entries(values)) if (validKey(key) && typeof value === "string" && !url.searchParams.has(key)) {
+			url.searchParams.set(key, value);
+			restored = true;
+		}
+		if (restored) window.history.replaceState(window.history.state, "", url.href);
+		Reflect.set(window, "__correRosaTrackingEntry", {
+			pathname: url.pathname,
+			received,
+			saved: values
+		});
+	} catch {}
+	return {
+		received,
+		saved: values
+	};
+})(["utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","gclid","ttclid","src","sck","xcod"],"corre-rosa-tracking-v2","corre_rosa_tracking_v2","corre-rosa-attribution-session-v1",2592000000,window.location.search,true);</script><script id="meta-pixel-bootstrap">(function(f,b,e,v,n,t,s){
+  if(f.__correRosaMetaPixel === '3547034528836798')return;
+  f.__correRosaMetaPixel='3547034528836798';
+  if(!f.fbq){
+    n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=true;n.version='2.0';n.queue=[];
+    t=b.createElement(e);t.async=true;t.src=v;
+    s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);
+  }
+  f.fbq('init','3547034528836798');
+  f.fbq('trackSingle','3547034528836798','PageView');
+})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');</script><script id="utmify-pixel-config">window.pixelId = "6ace976f8708e36bd87c56a5";</script><script id="utmify-pixel-loader" src="_ext/cdn.utmify.com.br/scripts/pixel/pixel.js" defer></script><script id="utmify-utm-script" src="_ext/cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck="true" data-utmify-prevent-subids="true" defer></script></head><body><noscript><img height="1" width="1" alt="" style="display:none" src="_ext/www.facebook.com/assets/tr"></noscript><!--$--><div class="campaign-shell"><a class="campaign-skip" href="#conteudo">Pular para o conteúdo</a><header class="campaign-header"><img src="campaign/campinos-logo.webp" alt="Olympikus" width="120" height="60"></header><main id="conteudo" class="campaign-main"><section class="campaign-intro"><img class="campaign-challenge" src="campaign/desafio-outubro-rosa.webp" alt="Desafio Outubro Rosa" width="577" height="433" fetchPriority="high"><h1><img class="campaign-headline" src="campaign/um-corre-por-todas.webp" alt="Um corre por todas" width="1000" height="333"></h1><p>Um passo também pode ser um gesto de cuidado. Neste <strong>Outubro Rosa</strong>, entre no movimento e teste seus conhecimentos sobre a causa.</p><p>São <strong>5 perguntas</strong> sobre conscientização, hábitos saudáveis e a campanha. Vamos juntas?</p><a class="campaign-button campaign-button--pulse" href="quiz/index.html">INICIAR QUIZ <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right" aria-hidden="true"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></a><span class="campaign-caption">Leva cerca de 2 minutos</span></section><div class="campaign-ribbon" aria-hidden="true"><img src="campaign/laco-outubro-rosa.webp" alt="" width="240" height="240"></div></main><footer class="campaign-footer">© 2026 Olympikus. Um corre por todas.</footer></div><script>(function(a,f){let l;try{l=JSON.parse(sessionStorage.getItem(a)||"{}")}catch{return}const n=l?.[f||history.state?.__TSR_key];let c=!1;for(const t in n){const e=n[t],o=e?.scrollX,s=e?.scrollY;if(Number.isFinite(o)&&Number.isFinite(s)){if(t==="window")scrollTo(o,s),c=!0;else if(t)try{const r=document.querySelector(t);r&&(r.scrollLeft=o,r.scrollTop=s)}catch{}}}if(c)return;const i=location.hash.slice(1);if(i){const t=history.state?.__hashScrollIntoViewOptions??!0;if(t){const e=document.getElementById(i);e&&e.scrollIntoView(t)}return}scrollTo(0,0)})("tsr-scroll-restoration-v1_3");document.currentScript.remove()</script><!--/$--><script data-tsr-stream-part="">(self.$R=self.$R||{})["tsr"]=[];self.$_TSR={h(){this.hydrated=!0,this.c()},e(){this.streamEnded=!0,this.c()},c(){this.hydrated&&this.streamEnded&&(delete self.$_TSR,delete self.$R.tsr)},p(e){this.initialized?e():this.buffer.push(e)},buffer:[]};$_TSR.router=($R=>$R[0]={manifest:$R[1]={routes:$R[2]={__root__:$R[3]={preloads:$R[4]=["/assets/index-PLGzEtP5.js","/assets/useRouter-Dpb7RwMI.js","/assets/createServerFn-BvYVUQWk.js","/assets/link-BH4TZkOC.js","/assets/rastreamento-DaPTTQBg.js","/assets/tracking-BmYU30qX.js","/assets/campaign-DrCUSxaj.js","/assets/preload-helper-BmLnFoW3.js"],scripts:$R[5]=[$R[6]={attrs:$R[7]={type:"module",async:!0,src:"/assets/index-PLGzEtP5.js"}}]},"/":$R[8]={preloads:$R[9]=["/assets/routes-B5DyioSp.js","/assets/createLucideIcon-DyOSRp63.js","/assets/campaign-frame-C4KkkZVY.js"]}}},matches:$R[10]=[$R[11]={i:"__root__ ",u:1793818920392,s:"success",ssr:!0},$R[12]={i:"  ",u:1793818920392,s:"success",ssr:!0}]})($R["tsr"]);$_TSR.e();{let s=document.currentScript,p;while((p=s.previousElementSibling)&&p.hasAttribute('data-tsr-stream-part'))p.remove();s.remove()}</script><script type="module" async src="assets/index-PLGzEtP5.js"></script><script>document.currentScript.remove();/*$tsr-stream-boundary*/</script></body></html>
