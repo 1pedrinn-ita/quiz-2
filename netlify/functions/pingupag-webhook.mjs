@@ -2,11 +2,11 @@ import {
   jsonResponse,
   methodNotAllowed,
   supabaseRequest,
-} from "./lib/supabase.mjs";
+from "../lib/pingupag.mjs"
 import {
   listTransactionsByReference,
   mapGatewayStatus,
-} from "./lib/pingupag.mjs";
+from "../lib/pingupag.mjs"
 
 async function getPayment(reference, env) {
   const query = new URLSearchParams({
