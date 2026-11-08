@@ -11,3 +11,23 @@
   from = "/api/pingupag-webhook"
   to = "/.netlify/functions/pingupag-webhook"
   status = 200
+
+[[redirects]]
+  from = "/api/create-order"
+  to = "/.netlify/functions/create-order"
+  status = 200
+
+[[redirects]]
+  from = "/api/orders"
+  to = "/.netlify/functions/get-order"
+  status = 200
+
+[[redirects]]
+  from = "/api/update-order-tracking"
+  to = "/.netlify/functions/update-order-tracking"
+  status = 200
+
+[[redirects]]
+  from = "/api/track-order"
+  to = "/.netlify/functions/track-order"
+  status = 200

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e5006d" />
+    <title>Monte seu kit | Um corre por todas</title>
+    <link rel="preload" as="font" href="/fonts/inter-latin-variable.woff2" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/assets/styles-wnzisgRz.css" />
+    <link rel="stylesheet" href="/assets/unified-checkout.css" />
+  </head>
+  <body>
+    <div class="campaign-shell campaign-shell--shop unified-shell">
+      <a class="campaign-skip" href="#conteudo">Pular para o conteúdo</a>
+      <header class="campaign-header"><a href="/loja/" aria-label="Voltar à loja"><img src="/campaign/campinos-logo.webp" alt="Olympikus" width="120" height="60" /></a></header>
+      <main id="conteudo" class="unified-main">
+        <a class="unified-back" href="/loja/">← Voltar ao kit</a>
+        <div class="unified-heading"><span class="unified-eyebrow">KIT CORRE ROSA</span><h1>Monte seu kit</h1><p>Escolha o tamanho de cada peça e a entrega. Suas escolhas seguem com você para o checkout.</p></div>
+        <form id="unified-form" novalidate>
+          <section class="unified-products" aria-label="Tamanhos do kit">
+            <article class="unified-product" data-product="shoe">
+              <div class="unified-product-image"><img src="/campaign/tenis-galeria-v2.webp" alt="Tênis Olympikus Corre Max 2 Outubro Rosa" width="800" height="800" /></div>
+              <div class="unified-product-info"><span class="unified-number">01 · TÊNIS</span><h2>Corre Max 2 Outubro Rosa</h2><p>Uma peça do Kit Corre Rosa</p><fieldset class="unified-sizes"><legend>Selecione o tamanho</legend><div class="unified-size-list" data-options="shoe"></div></fieldset><p class="unified-error" aria-live="polite"></p></div>
+            </article>
+            <article class="unified-product" data-product="shirt">
+              <div class="unified-product-image"><img src="/campaign/regata-frente.webp" alt="Regata do Kit Corre Rosa" width="800" height="800" loading="lazy" /></div>
+              <div class="unified-product-info"><span class="unified-number">02 · REGATA</span><h2>Regata do Kit Corre Rosa</h2><p>Uma peça do Kit Corre Rosa</p><fieldset class="unified-sizes"><legend>Selecione o tamanho</legend><div class="unified-size-list" data-options="shirt"></div></fieldset><p class="unified-error" aria-live="polite"></p></div>
+            </article>
+            <article class="unified-product" data-product="shorts">
+              <div class="unified-product-image"><img src="/campaign/shorts-frente.webp" alt="Shorts do Kit Corre Rosa" width="800" height="800" loading="lazy" /></div>
+              <div class="unified-product-info"><span class="unified-number">03 · SHORTS</span><h2>Shorts do Kit Corre Rosa</h2><p>Uma peça do Kit Corre Rosa</p><fieldset class="unified-sizes"><legend>Selecione o tamanho</legend><div class="unified-size-list" data-options="shorts"></div></fieldset><p class="unified-error" aria-live="polite"></p></div>
+            </article>
+          </section>
+
+          <section class="unified-section" aria-labelledby="shipping-title">
+            <div class="unified-section-heading"><span class="unified-number">04 · ENTREGA</span><h2 id="shipping-title">Informe o CEP</h2><p>Usaremos o CEP para localizar o endereço e apresentar as modalidades disponíveis.</p></div>
+            <label class="unified-cep-label" for="unified-cep">CEP</label>
+            <div class="unified-cep-row"><input id="unified-cep" name="cep" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" aria-describedby="cep-status" /><span id="cep-status" role="status" aria-live="polite"></span></div>
+            <div id="address-preview" class="unified-address" hidden></div>
+            <fieldset id="shipping-options" class="unified-shipping" disabled>
+              <legend>Escolha uma modalidade</legend>
+              <label class="unified-shipping-card"><input type="radio" name="shipping" value="free" /><span class="unified-radio-mark"></span><span class="unified-shipping-copy"><strong>Frete grátis</strong><small>Prazo estimado: 5 a 12 dias úteis</small></span><b>R$ 0,00</b></label>
+              <label class="unified-shipping-card"><input type="radio" name="shipping" value="express" /><span class="unified-radio-mark"></span><span class="unified-shipping-copy"><strong>Frete standard</strong><small>Prazo estimado: 2 a 5 dias úteis</small></span><b>R$ 8,45</b></label>
+            </fieldset>
+            <p id="shipping-error" class="unified-error" aria-live="polite"></p>
+          </section>
+
+          <section class="unified-section unified-summary" aria-labelledby="summary-title">
+            <div class="unified-section-heading"><span class="unified-number">RESUMO</span><h2 id="summary-title">Seu Kit Corre Rosa</h2></div>
+            <div class="unified-summary-items" id="summary-items"></div>
+            <div class="unified-total-row"><span>Kit Corre Rosa</span><strong>R$ 97,90</strong></div>
+            <div class="unified-total-row"><span id="summary-shipping-label">Frete</span><strong id="summary-shipping-price">Selecione uma modalidade</strong></div>
+            <div class="unified-total-row unified-grand-total"><span>Total</span><strong id="summary-total">R$ 97,90</strong></div>
+          </section>
+          <p id="form-error" class="unified-error unified-form-error" role="alert"></p>
+          <button id="continue-button" class="campaign-button unified-continue" type="submit" disabled>CONTINUAR PARA O CHECKOUT</button>
+          <p class="unified-secure-note">Você informará seus dados pessoais e o endereço completo na próxima etapa.</p>
+        </form>
+      </main>
+      <footer class="campaign-footer">© 2026 Olympikus. Um corre por todas.</footer>
+    </div>
+    <script src="/assets/unified-checkout.js" defer></script>
+  </body>
+</html>

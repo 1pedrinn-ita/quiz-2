@@ -7,10 +7,11 @@ import {
   listTransactionsByReference,
   mapGatewayStatus,
 } from "../lib/pingupag.mjs";
+import { bodyWithinLimit, enforceRateLimits } from "../lib/orders.mjs";
 
 async function getPayment(reference, env) {
   const query = new URLSearchParams({
-    select: "id,order_id,reference,amount_cents,status",
+    select: "id,order_id,reference,amount_cents,status,gateway_transaction_id",
     reference: `eq.${reference}`,
     limit: "1",
   });
@@ -37,9 +38,19 @@ async function updatePayment(payment, status, transactionId, env) {
   }
 }
 
-export async function handler(event) {
+export async function handler(event, context) {
   if (event.httpMethod !== "POST") {
     return methodNotAllowed("POST");
+  }
+  if (!bodyWithinLimit(event, 16 * 1024)) return jsonResponse(413, { error: "Request body too large" });
+  try {
+    if (!await enforceRateLimits(event, "pingupag-webhook", [
+      { maxRequests: 120, windowSeconds: 60 },
+      { maxRequests: 600, windowSeconds: 3600 },
+    ], context)) return jsonResponse(429, { error: "Webhook rate limit exceeded" });
+  } catch (error) {
+    console.error("Webhook rate limit unavailable", { status: error.status || "internal_error" });
+    return jsonResponse(503, { error: "Webhook temporarily unavailable" });
   }
 
   let body;
@@ -62,12 +73,15 @@ export async function handler(event) {
     }
 
     const transactions = await listTransactionsByReference(reference, env);
-    const matches = transactions.filter(
+    const referenceMatches = transactions.filter((item) => String(item.external_id) === reference);
+    const matches = referenceMatches.filter(
       (item) =>
-        String(item.external_id) === reference &&
-        Number(item.amount) === payment.amount_cents,
+        Number.isSafeInteger(item.amount) &&
+        item.amount === payment.amount_cents &&
+        item.id !== undefined && item.id !== null && String(item.id).length > 0 &&
+        (!payment.gateway_transaction_id || String(item.id) === payment.gateway_transaction_id),
     );
-    if (matches.length !== 1) {
+    if (referenceMatches.length !== 1 || matches.length !== 1) {
       return jsonResponse(409, { error: "Gateway transaction not verified" });
     }
     const transaction = matches[0];
