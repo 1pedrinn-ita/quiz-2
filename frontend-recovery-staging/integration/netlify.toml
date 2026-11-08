@@ -1,0 +1,41 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/create-order"
+  to = "/.netlify/functions/create-order"
+  status = 200
+[[redirects]]
+  from = "/api/create-pix"
+  to = "/.netlify/functions/create-pix"
+  status = 200
+[[redirects]]
+  from = "/api/orders"
+  to = "/.netlify/functions/get-order"
+  status = 200
+[[redirects]]
+  from = "/api/track-order"
+  to = "/.netlify/functions/track-order"
+  status = 200
+[[redirects]]
+  from = "/api/update-order-tracking"
+  to = "/.netlify/functions/update-order-tracking"
+  status = 200
+[[redirects]]
+  from = "/api/issue-order-access-code"
+  to = "/.netlify/functions/issue-order-access-code"
+  status = 200
+[[redirects]]
+  from = "/api/lookup-order-by-access-code"
+  to = "/.netlify/functions/lookup-order-by-access-code"
+  status = 200
+[[redirects]]
+  from = "/api/staging-simulate-approval"
+  to = "/.netlify/functions/staging-simulate-approval"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
