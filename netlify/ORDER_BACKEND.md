@@ -7,11 +7,11 @@ These endpoints are server infrastructure only. They are not wired into the miss
 Configure these variables in the Netlify function environment:
 
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the existing server side Supabase client.
-- `PINGUPAG_API_KEY` for the existing PIX functions.
-- `URL` for the deployed site URL used by the PinguPag postback.
+- `PAGPIXHUB_API_KEY` for PagPix Hub requests. Create this key in PagPix Hub and store it only in the Netlify function environment.
+- `PAGPIXHUB_WEBHOOK_SECRET` for validating the PagPix Hub webhook signature. Configure the webhook in PagPix Hub to call `/api/pagpix-webhook` and copy its `whsec_...` secret into this variable.
 - `CHECKOUT_TOKEN_SECRETS_JSON`: version-to-secret JSON map, for example `{"1":"<old-32-byte-secret>","2":"<new-32-byte-secret>"}`. Each secret must contain at least 32 bytes. Keep old versions available while any order can still be accessed. Version 1 preserves tokens issued by the original backend.
 - `CHECKOUT_TOKEN_ACTIVE_VERSION`: map key used for new orders. Add a new secret/version and switch this value to rotate; do not remove earlier keys while their orders remain accessible. If the map is absent, the legacy `CHECKOUT_TOKEN_SECRET` is accepted as version 1.
-- `PIX_MAX_AMOUNT_CENTS`: required positive integer no greater than PostgreSQL `integer` maximum (`2147483647`). The PinguPag documentation specifies an integer amount in cents but does not publish a maximum, so set a lower limit only from the merchant's confirmed gateway terms or support.
+- `PIX_MAX_AMOUNT_CENTS`: required integer between 500 (PagPix Hub minimum) and PostgreSQL `integer` maximum (`2147483647`).
 - `PIX_ORDER_CATALOG_JSON`: server-owned JSON map of SKU to trusted price and name. Example shape: `{"SKU_1":{"name":"Item","unitAmountCents":2590,"requiresShipping":true}}`. Never accept prices or descriptions from the browser as authoritative.
 - `ORDER_OPERATIONS_TOKEN`: at least 32 random bytes encoded as hex or base64url, used only by an authorized server/operator to update shipment data.
 - `RATE_LIMIT_SECRET`: at least 32 random bytes. It HMAC-hashes the trusted Netlify client IP before storing rate-limit buckets in Supabase.
@@ -46,9 +46,9 @@ Accepts `{ "code": "..." }` for public tracking lookup. Only a unique tracking c
 
 ## PIX recovery and webhook validation
 
-The existing PinguPag create and query endpoints are unchanged. The create response is checked against the stored reference and amount. If a request times out after the gateway may have accepted it, a retry queries by the same reference and never creates another charge for an existing `creating`/`pending` record. If PinguPag reports a pending transaction but does not return its Pix code in the documented list response, the API leaves the charge recorded and asks for reconciliation rather than duplicating it.
+PagPix Hub creates PIX charges with an idempotency key derived from the order reference. The API checks the returned amount, stores the transaction id and copy-and-paste code, and returns a pending `pix_status` if the code is still generating. A retry reconciles by `external_reference`; it does not create a second charge for an existing `creating`/`pending` record. The PagPix webhook is accepted only with a valid HMAC-SHA256 signature and matching transaction id, reference, and amount.
 
-The webhook treats the posted status as untrusted, rate limits the request, and confirms a single transaction through the authenticated PinguPag query API with matching reference, amount, and stored gateway transaction ID. PinguPag's published webhook contract does not specify a signature header; do not add an invented signature format. Configure any provider signature only if PinguPag documents it.
+The PagPix webhook validates its documented `PagPixHub-Signature` HMAC header (including the five-minute replay window), rate limits requests, and matches the signed transaction event to the stored reference, amount, and gateway transaction ID before changing payment state.
 
 ## Unavailable configuration
 

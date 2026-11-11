@@ -8,8 +8,8 @@
   status = 200
 
 [[redirects]]
-  from = "/api/pingupag-webhook"
-  to = "/.netlify/functions/pingupag-webhook"
+  from = "/api/pagpix-webhook"
+  to = "/.netlify/functions/pagpix-webhook"
   status = 200
 
 [[redirects]]

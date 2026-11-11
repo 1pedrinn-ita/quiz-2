@@ -6,10 +6,11 @@ import {
 } from "../lib/supabase.mjs";
 import {
   createTransaction,
+  getTransaction,
   hasApiKey,
   listTransactionsByReference,
   mapGatewayStatus,
-} from "../lib/pingupag.mjs";
+} from "../lib/pagpix.mjs";
 import { bodyWithinLimit, enforceRateLimits, maxOrderAmountCents } from "../lib/orders.mjs";
 
 const ORDER_FIELDS =
@@ -107,10 +108,10 @@ async function applyGatewayStatus(payment, status, transactionId, env) {
 
 async function recoverExistingPayment(order, payment, env) {
   const transactions = await listTransactionsByReference(order.reference, env);
-  const referenceMatches = transactions.filter((item) => String(item.external_id) === order.reference);
+  const referenceMatches = transactions.filter((item) => String(item.external_reference) === order.reference);
   const matches = referenceMatches.filter((item) =>
-    Number.isSafeInteger(item.amount) &&
-    item.amount === order.amount_cents &&
+    Number.isSafeInteger(item.amount_cents) &&
+    item.amount_cents === order.amount_cents &&
     item.id !== undefined && item.id !== null && String(item.id).length > 0,
   );
   if (referenceMatches.length !== 1 || matches.length !== 1) {
@@ -121,7 +122,9 @@ async function recoverExistingPayment(order, payment, env) {
   if (payment.gateway_transaction_id && payment.gateway_transaction_id !== transactionId) {
     return response(409, { error: "Gateway transaction does not match stored payment" });
   }
-  await applyGatewayStatus(payment, mapGatewayStatus(transaction.status), transactionId, env);
+  const fullTransaction = await getTransaction(transactionId, env);
+  await applyGatewayStatus(payment, mapGatewayStatus(fullTransaction.status), transactionId, env);
+  await savePixData(payment, fullTransaction, transactionId, env);
   const refreshed = await getPayment(order.id, env);
   if (refreshed?.status === "pending" && refreshed.qr_code) {
     return response(200, pixResult(refreshed));
@@ -130,9 +133,23 @@ async function recoverExistingPayment(order, payment, env) {
     return response(200, { status: "approved", reference: order.reference });
   }
   if (refreshed?.status === "pending") {
-    return response(409, { error: "Payment was recovered without a Pix code; no duplicate charge was created" });
+    return response(202, { status: "pending", pix_status: fullTransaction.pix_status || "generating", reference: order.reference });
   }
   return response(409, { error: "Payment is not payable; query the order status" });
+}
+
+async function savePixData(payment, transaction, transactionId, env) {
+  const updateQuery = new URLSearchParams({ id: `eq.${payment.id}` });
+  await supabaseRequest(`pix_payments?${updateQuery}`, {
+    method: "PATCH",
+    headers: { prefer: "return=representation" },
+    body: JSON.stringify({
+      gateway_transaction_id: transactionId,
+      qr_code: transaction.pix?.copy_paste || null,
+      qr_code_base64: null,
+      expires_at: transaction.pix?.expires_at || null,
+    }),
+  }, env);
 }
 
 export async function handler(event, context) {
@@ -191,7 +208,7 @@ export async function handler(event, context) {
       !order ||
       order.status !== "pending" ||
       !Number.isSafeInteger(order.amount_cents) ||
-      order.amount_cents < 1 ||
+      order.amount_cents < 500 ||
       order.amount_cents > maxAmountCents ||
       typeof order.reference !== "string" ||
       !order.reference ||
@@ -250,26 +267,26 @@ export async function handler(event, context) {
       throw new Error("Unable to claim payment");
     }
 
-    const siteUrl = env.URL;
-    if (!siteUrl) {
-      throw new Error("Missing Netlify URL");
-    }
-
     let gatewayResponse;
     try {
       gatewayResponse = await createTransaction(
         {
-          amount: order.amount_cents,
+          amount_cents: order.amount_cents,
+          method: "pix",
           description: order.description,
-          reference: order.reference,
-          source: "api_externa",
-          customer: order.customer,
-          postback_url: `${siteUrl.replace(/\/$/, "")}/api/pingupag-webhook`,
+          external_reference: order.reference,
+          customer: {
+            email: order.customer.email,
+            name: order.customer.name,
+            cpf: order.customer.document,
+            phone: order.customer.phone,
+          },
         },
+        order.reference,
         env,
       );
     } catch (error) {
-      console.error("PinguPag transaction creation failed", {
+      console.error("PagPix transaction creation failed", {
         status: error.status || "network_error",
       });
       return response(502, {
@@ -278,14 +295,11 @@ export async function handler(event, context) {
     }
 
     if (
-      gatewayResponse?.status !== "success" ||
-      !gatewayResponse.qr_code ||
-      !gatewayResponse.transaction_id ||
-      String(gatewayResponse.id) !== order.reference ||
-      !Number.isSafeInteger(gatewayResponse.amount) ||
-      gatewayResponse.amount !== order.amount_cents
+      !gatewayResponse?.id ||
+      !Number.isSafeInteger(gatewayResponse.amount_cents) ||
+      gatewayResponse.amount_cents !== order.amount_cents
     ) {
-      console.error("PinguPag returned an incomplete transaction response");
+      console.error("PagPix returned an incomplete transaction response");
       return response(502, {
         error: "Payment creation outcome requires reconciliation",
       });
@@ -294,38 +308,28 @@ export async function handler(event, context) {
     await applyGatewayStatus(
       { ...order, amount_cents: order.amount_cents },
       "pending",
-      String(gatewayResponse.transaction_id),
+      String(gatewayResponse.id),
       env,
     );
-    const updateQuery = new URLSearchParams({ id: `eq.${claim.id}` });
-    await supabaseRequest(
-      `pix_payments?${updateQuery}`,
-      {
-        method: "PATCH",
-        headers: { prefer: "return=representation" },
-        body: JSON.stringify({
-          gateway_transaction_id: String(gatewayResponse.transaction_id),
-          qr_code: gatewayResponse.qr_code,
-          qr_code_base64: gatewayResponse.qr_code_base64 || null,
-          expires_at: gatewayResponse.expires_at || null,
-        }),
-      },
-      env,
-    );
+    await savePixData(claim, gatewayResponse, String(gatewayResponse.id), env);
 
     const savedPayment = await getPayment(order.id, env);
-    if (!savedPayment || savedPayment.gateway_transaction_id !== String(gatewayResponse.transaction_id)) {
+    if (!savedPayment || savedPayment.gateway_transaction_id !== String(gatewayResponse.id)) {
       return response(502, { error: "Payment created but not fully recorded; reconciliation required" });
     }
     if (savedPayment.status === "approved") {
       return response(200, { status: "approved", reference: order.reference });
     }
-    return response(200, pixResult({
+    const result = pixResult({
       ...savedPayment,
-      qr_code: savedPayment.qr_code || gatewayResponse.qr_code,
-      qr_code_base64: savedPayment.qr_code_base64 || gatewayResponse.qr_code_base64 || null,
-      expires_at: savedPayment.expires_at || gatewayResponse.expires_at || null,
-    }));
+      qr_code: savedPayment.qr_code || gatewayResponse.pix?.copy_paste || null,
+      qr_code_base64: null,
+      expires_at: savedPayment.expires_at || gatewayResponse.pix?.expires_at || null,
+    });
+    if (!savedPayment.qr_code) {
+      return response(202, { status: "pending", pix_status: gatewayResponse.pix_status || "generating", reference: order.reference });
+    }
+    return response(200, result);
   } catch (error) {
     console.error("Pix creation handler failed", {
       status: error.status || "internal_error",
